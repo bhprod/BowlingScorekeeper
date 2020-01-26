@@ -1,0 +1,37 @@
+﻿<UserControl x:Class="BowlingScoring.View.GameBoardView"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:view="clr-namespace:BowlingScoring.View"
+             xmlns:viewmodel="clr-namespace:BowlingScoring.ViewModel"
+             mc:Ignorable="d" 
+             d:DesignHeight="450" d:DesignWidth="1000">
+    <UserControl.DataContext>
+        <viewmodel:FrameViewModel x:Name="ViewModel"/>
+    </UserControl.DataContext>
+    <WrapPanel>
+    <Grid Width="Auto">
+        <Grid.ColumnDefinitions>
+            
+        </Grid.ColumnDefinitions>
+
+        <Grid.RowDefinitions>
+            <RowDefinition />
+            <RowDefinition />
+        </Grid.RowDefinitions>
+        <StackPanel Orientation="Horizontal">
+        <view:FrameView Grid.Row="0" Grid.Column="0" DataContext="{Binding FrameOne}"/>
+        <view:FrameView Grid.Row="0" Grid.Column="1" DataContext="{Binding FrameTwo}"/>
+        <view:FrameView Grid.Row="0" Grid.Column="2" DataContext="{Binding FrameThree}"/>
+        <view:FrameView Grid.Row="0" Grid.Column="3" DataContext="{Binding FrameFour}"/>
+        <view:FrameView Grid.Row="0" Grid.Column="4" DataContext="{Binding FrameFive}"/>
+        <view:FrameView Grid.Row="0" Grid.Column="5" DataContext="{Binding FrameSix}"/>
+        <view:FrameView Grid.Row="0" Grid.Column="6" DataContext="{Binding FrameSeven}"/>
+        <view:FrameView Grid.Row="0" Grid.Column="7" DataContext="{Binding FrameEight}"/>
+        <view:FrameView Grid.Row="0" Grid.Column="8" DataContext="{Binding FrameNine}"/>
+            <view:FrameView x:Name="TenthFrame" Grid.Column="9" DataContext="{Binding FrameTen}"/>
+        </StackPanel>
+    </Grid>
+    </WrapPanel>
+</UserControl>
