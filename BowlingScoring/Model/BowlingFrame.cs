@@ -11,8 +11,14 @@ namespace BowlingScoring.Model
     {
         public BowlingFrame()
         {
-            BonusRolls = new int[2];
         }
+
+        public BowlingFrame(int id)
+        {
+            _frameId = id;
+        }
+
+        private int _frameId;
 
 
         private const int NUMBER_OF_PINS = 10;
@@ -25,15 +31,17 @@ namespace BowlingScoring.Model
             get { return _firstRollString; }
             set 
             {
+                //TODO update score correctly when backspaced and input reentered, like the second ball
                 _firstRollString = value;
                 if (value.Equals("x", StringComparison.OrdinalIgnoreCase))
                 {
+                    FinishedEnteringRolls = true;
                     FirstRollScore = NUMBER_OF_PINS;
-                    SecondRollScoreString = "-";
+                    SecondRollScoreString = (IsTenthFrame) ? "" : "-";
                     _firstRollString = value;
-                    TotalFrameScore = 10;
+                    
                 }
-                if (value.Equals("-"))
+                else if (value.Equals("-"))
                 {
                     FirstRollScore = 0;
                     _firstRollString = value;
@@ -46,7 +54,7 @@ namespace BowlingScoring.Model
                         _firstRollString = value;
                     }
                 }
-
+                OnRollScoreEntered();
                 OnPropertyChanged(nameof(FirstRollString));
             }
         }
@@ -58,21 +66,25 @@ namespace BowlingScoring.Model
             get { return _secondRollScoreString; }
             set
             {
+                //Sterilize inputs
+                if (string.IsNullOrEmpty(value))
+                {
+                    _secondRollScoreString = "";
+                    ScoringFinished = false;
+                    return;
+                }                
+
                 if (value.Equals("/"))
                 {
                     SecondRollScore = NUMBER_OF_PINS - _rollOneScore;
                     _secondRollScoreString = value;
+                    FinishedEnteringRolls = true;
                 }
-                else if (value.Equals("-")) { SecondRollScore = 0; _secondRollScoreString = value; }
+                else if (value.Equals("-")) { SecondRollScore = 0; _secondRollScoreString = value; FinishedEnteringRolls = true; }
                 else if (int.TryParse(value, out int score))
                 {
                     //Validate the entered int and ensure the score can't sum to > 10 
-                    if (_rollOneScore + score > 10)
-                    {
-                        _secondRollScoreString = "";
-                        return;
-                    }
-                    else if (score > 9 || score < 1)
+                    if ((_rollOneScore + score > 10) || (score > 9 || score < 1))
                     {
                         _secondRollScoreString = "";
                         return;
@@ -80,7 +92,8 @@ namespace BowlingScoring.Model
                     else
                     {
                         _secondRollScoreString = value;
-                        SecondRollScore = score;
+                        FinishedEnteringRolls = true;
+                        SecondRollScore = score;                        
                     }
                 }
                 OnPropertyChanged(nameof(SecondRollScoreString));
@@ -91,11 +104,14 @@ namespace BowlingScoring.Model
         public int FirstRollScore
         {
             get { return _rollOneScore; }
-            set { _rollOneScore = value; OnPropertyChanged(nameof(FirstRollScore));
+            set { 
+                _rollOneScore = value;
+                OnPropertyChanged(nameof(FirstRollScore));
                 if (value == NUMBER_OF_PINS)
                 {
-                    OnRollScoreEntered();
+                    FinishedEnteringRolls = true;
                 }
+                OnRollScoreEntered();
             }
         }
 
@@ -128,11 +144,16 @@ namespace BowlingScoring.Model
             PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
         }
 
-        public bool FinishedEnteringRolls;
+        private bool _finishedEnteringRolls;
+
+        public bool FinishedEnteringRolls
+        {
+            get { return _finishedEnteringRolls; }
+            set { _finishedEnteringRolls = value; OnPropertyChanged(nameof(FinishedEnteringRolls)); }
+        }
         //todo: fix when number is entered and then changed the score doesn't update
         private void OnRollScoreEntered()
         {
-            FinishedEnteringRolls = true;
             RollScoreEntered?.Invoke(this, new EventArgs());
         }
 

@@ -55,6 +55,7 @@
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </ApplicationDefinition>
+    <Compile Include="InverseBoolConverter.cs" />
     <Compile Include="Model\BowlingFrame.cs" />
     <Compile Include="Model\ScoreKeeper.cs" />
     <Compile Include="ViewModel\FrameViewModel.cs" />
