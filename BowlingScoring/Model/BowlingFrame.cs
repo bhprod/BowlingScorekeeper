@@ -9,37 +9,62 @@ namespace BowlingScoring.Model
 {
     public class BowlingFrame : INotifyPropertyChanged
     {
-        public BowlingFrame()
-        {
-        }
+        //TODO: bug where if scores are entered, then deleted in reverse order the score will not update
 
-        public BowlingFrame(int id)
-        {
-            _frameId = id;
-        }
-
-        private int _frameId;
-
+        public BowlingFrame() { }
 
         private const int NUMBER_OF_PINS = 10;
-        private int _rollOneScore;
 
+        #region Events
+        public event PropertyChangedEventHandler PropertyChanged;
+        private void OnPropertyChanged(string propertyName)
+        {
+            PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
+        }
+
+        public event EventHandler RollScoreEntered;
+        private void OnRollScoreEntered()
+        {
+            RollScoreEntered?.Invoke(this, new EventArgs());
+        }
+        #endregion
+
+        #region First Roll
         private string _firstRollString;
-
+        private int _firstRollScore;
+        public int FirstRollScore
+        {
+            get { return _firstRollScore; }
+            set
+            {
+                _firstRollScore = value;
+                OnPropertyChanged(nameof(FirstRollScore));
+                if (value == NUMBER_OF_PINS)
+                {
+                    FinishedEnteringRolls = true;
+                }
+                OnRollScoreEntered();
+            }
+        }
         public string FirstRollString
         {
             get { return _firstRollString; }
-            set 
+            set
             {
-                //TODO update score correctly when backspaced and input reentered, like the second ball
-                _firstRollString = value;
+                if (string.IsNullOrEmpty(value))
+                {
+                    _firstRollString = "";
+                    ScoringFinished = false;
+                    return;
+                }
+
                 if (value.Equals("x", StringComparison.OrdinalIgnoreCase))
                 {
                     FinishedEnteringRolls = true;
                     FirstRollScore = NUMBER_OF_PINS;
-                    SecondRollScoreString = (IsTenthFrame) ? "" : "-";
+                    SecondRollString = (IsTenthFrame) ? "" : "-";
                     _firstRollString = value;
-                    
+
                 }
                 else if (value.Equals("-"))
                 {
@@ -59,71 +84,63 @@ namespace BowlingScoring.Model
             }
         }
 
-        private string _secondRollScoreString;
+        #endregion
 
-        public string SecondRollScoreString
-        {
-            get { return _secondRollScoreString; }
-            set
-            {
-                //Sterilize inputs
-                if (string.IsNullOrEmpty(value))
-                {
-                    _secondRollScoreString = "";
-                    ScoringFinished = false;
-                    return;
-                }                
-
-                if (value.Equals("/"))
-                {
-                    SecondRollScore = NUMBER_OF_PINS - _rollOneScore;
-                    _secondRollScoreString = value;
-                    FinishedEnteringRolls = true;
-                }
-                else if (value.Equals("-")) { SecondRollScore = 0; _secondRollScoreString = value; FinishedEnteringRolls = true; }
-                else if (int.TryParse(value, out int score))
-                {
-                    //Validate the entered int and ensure the score can't sum to > 10 
-                    if ((_rollOneScore + score > 10) || (score > 9 || score < 1))
-                    {
-                        _secondRollScoreString = "";
-                        return;
-                    }
-                    else
-                    {
-                        _secondRollScoreString = value;
-                        FinishedEnteringRolls = true;
-                        SecondRollScore = score;                        
-                    }
-                }
-                OnPropertyChanged(nameof(SecondRollScoreString));
-            }
-        }
-
-        public event EventHandler RollScoreEntered;
-        public int FirstRollScore
-        {
-            get { return _rollOneScore; }
-            set { 
-                _rollOneScore = value;
-                OnPropertyChanged(nameof(FirstRollScore));
-                if (value == NUMBER_OF_PINS)
-                {
-                    FinishedEnteringRolls = true;
-                }
-                OnRollScoreEntered();
-            }
-        }
-
+        #region Second Roll
         private int _rollTwoScore;
-
         public int SecondRollScore
         {
             get { return _rollTwoScore; }
             set { _rollTwoScore = value; OnPropertyChanged(nameof(SecondRollScore)); OnRollScoreEntered(); }
         }
-        private int _bonusRollScore;
 
+        private string _secondRollString;
+        public string SecondRollString
+        {
+            get { return _secondRollString; }
+            set
+            {
+                if (string.IsNullOrEmpty(value))
+                {
+                    _secondRollString = "";
+                    ScoringFinished = false;
+                    return;
+                }
+
+                if (value.Equals("/"))
+                {
+                    _secondRollString = value;
+                    FinishedEnteringRolls = true;
+                    SecondRollScore = NUMBER_OF_PINS - _firstRollScore;
+                }
+                else if (value.Equals("-")) { SecondRollScore = 0; _secondRollString = value; FinishedEnteringRolls = true; }
+                else if (int.TryParse(value, out int score))
+                {
+                    if ((_firstRollScore + score > NUMBER_OF_PINS) || (score > 9 || score < 1)) //Validate the int and ensure the score can't sum to > 10 
+                    {
+                        _secondRollString = "";
+                        return;
+                    }
+                    else
+                    {
+                        _secondRollString = value;
+                        FinishedEnteringRolls = true;
+                        SecondRollScore = score;
+                    }
+                }
+                OnPropertyChanged(nameof(SecondRollString));
+            }
+        }
+        #endregion
+
+        #region 10th frame
+        private bool _hasTenthFrameBonus;
+        public bool HasTenthFrameBonus
+        {
+            get { return _hasTenthFrameBonus; }
+            set { _hasTenthFrameBonus = value; OnPropertyChanged(nameof(HasTenthFrameBonus)); }
+        }
+        private int _bonusRollScore;
         public int BonusRollScore
         {
             get { return _bonusRollScore; }
@@ -131,72 +148,37 @@ namespace BowlingScoring.Model
         }
 
         private bool _isTenthFrame;
-
         public bool IsTenthFrame
         {
             get { return _isTenthFrame; }
             set { _isTenthFrame = value; OnPropertyChanged(nameof(IsTenthFrame)); }
         }
 
-        public event PropertyChangedEventHandler PropertyChanged;
-        private void OnPropertyChanged(string propertyName)
+        #endregion
+
+        private int _totalFrameScore;
+        public int TotalFrameScore
         {
-            PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
+            get => _totalFrameScore;
+            set
+            {
+                _totalFrameScore = value;
+                OnPropertyChanged(nameof(TotalFrameScore));
+            }
         }
 
         private bool _finishedEnteringRolls;
-
         public bool FinishedEnteringRolls
         {
             get { return _finishedEnteringRolls; }
             set { _finishedEnteringRolls = value; OnPropertyChanged(nameof(FinishedEnteringRolls)); }
         }
-        //todo: fix when number is entered and then changed the score doesn't update
-        private void OnRollScoreEntered()
+
+        private bool _scoringFinished;
+        public bool ScoringFinished
         {
-            RollScoreEntered?.Invoke(this, new EventArgs());
+            get { return _scoringFinished; }
+            set { _scoringFinished = value; OnPropertyChanged(nameof(ScoringFinished)); }
         }
-
-        private int _frameTotalScore;
-        public int TotalFrameScore
-        {
-            get => _frameTotalScore;
-            set
-            {
-                _frameTotalScore = value;
-                OnPropertyChanged(nameof(TotalFrameScore));
-            }
-        }
-
-        public bool ScoringFinished;
-        //public void SubscribedFrame_ScoreFinished(object sender, EventArgs e)
-        //{
-        //    var subscribedFrame = sender as BowlingFrame;
-
-        //    _frameTotalScore += subscribedFrame.RollOneScore;
-        //    if (subscribedFrame.RollTwoScore != 0)
-        //    {
-        //        _frameTotalScore += RollTwoScore;
-        //        ScoringFinished = true;
-        //        subscribedFrame.RollScoreEntered -= SubscribedFrame_ScoreFinished;
-        //    }
-        //}
-        private bool _hasTenthFrameBonus;
-
-        public bool HasTenthFrameBonus
-        {
-            get { return _hasTenthFrameBonus; }
-            set { _hasTenthFrameBonus = value; OnPropertyChanged(nameof(HasTenthFrameBonus)); }
-        }
-
-
-        //public bool HasTenthFrameBonus => IsTenthFrame && (RollOneScore == NUMBER_OF_PINS || (RollOneScore + RollTwoScore == NUMBER_OF_PINS));
-
-        public int[] BonusRolls;
-
-
-
-
-
     }
 }

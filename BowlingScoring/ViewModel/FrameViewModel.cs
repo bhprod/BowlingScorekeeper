@@ -17,7 +17,7 @@ namespace BowlingScoring.ViewModel
             _frames = new BowlingFrame[10];
             for (int i = 0; i < 10; i++)
             {
-                var bowlingFrame = new BowlingFrame(i);
+                var bowlingFrame = new BowlingFrame();
                 bowlingFrame.RollScoreEntered += BowlingFrame_RollScoreEntered;
                 _frames[i] = bowlingFrame;
             }
