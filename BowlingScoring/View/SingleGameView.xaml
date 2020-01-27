@@ -1,0 +1,62 @@
+﻿<UserControl x:Class="BowlingScoring.View.SingleGameView"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+             xmlns:view="clr-namespace:BowlingScoring.View"
+             xmlns:viewmodel="clr-namespace:BowlingScoring.ViewModel"
+             mc:Ignorable="d">
+    <UserControl.DataContext>
+        <viewmodel:FrameViewModel x:Name="ViewModel" />
+    </UserControl.DataContext>
+    <Grid>
+        <Grid.ColumnDefinitions >
+            <ColumnDefinition Width="Auto" />
+            <ColumnDefinition Width="Auto" />
+            <ColumnDefinition Width="Auto" />
+            <ColumnDefinition Width="Auto" />
+            <ColumnDefinition Width="Auto" />
+            <ColumnDefinition Width="Auto" />
+            <ColumnDefinition Width="Auto" />
+            <ColumnDefinition Width="Auto" />
+            <ColumnDefinition Width="Auto" />
+            <ColumnDefinition Width="Auto" />
+            <ColumnDefinition Width="AUto" />
+        </Grid.ColumnDefinitions>
+        <Grid.Resources>
+            <Style TargetType="{x:Type Border}" BasedOn="{StaticResource BorderContainerStyle}" />
+        </Grid.Resources>
+       
+            <TextBox x:Name="NameTextBox" IsTabStop="False" Width="100" Height="20" VerticalAlignment="Center" Style="{StaticResource TextBoxStyle}" Margin="5"/>
+            <Border Grid.Column="1">
+            <view:FrameView DataContext="{Binding FrameOne}" HorizontalAlignment="Stretch"/>
+        </Border>
+        <Border Grid.Column="2">
+            <view:FrameView  DataContext="{Binding FrameTwo}"/>
+        </Border>
+        <Border Grid.Column="3">
+            <view:FrameView  DataContext="{Binding FrameThree}"/>
+        </Border>
+        <Border Grid.Column="4">
+            <view:FrameView  DataContext="{Binding FrameFour}"/>
+        </Border>
+        <Border Grid.Column="5">
+            <view:FrameView  DataContext="{Binding FrameFive}"/>
+        </Border>
+        <Border Grid.Column="6">
+            <view:FrameView  DataContext="{Binding FrameSix}"/>
+        </Border>
+        <Border Grid.Column="7">
+            <view:FrameView  DataContext="{Binding FrameSeven}"/>
+        </Border>
+        <Border Grid.Column="8">
+            <view:FrameView  DataContext="{Binding FrameEight}"/>
+        </Border>
+        <Border Grid.Column="9">
+            <view:FrameView  DataContext="{Binding FrameNine}"/>
+        </Border>
+        <Border Grid.Column="10">
+            <view:FrameView x:Name="TenthFrame" Grid.Column="9" DataContext="{Binding FrameTen}"/>
+        </Border>
+    </Grid>
+</UserControl>

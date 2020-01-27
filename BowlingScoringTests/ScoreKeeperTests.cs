@@ -9,7 +9,7 @@ namespace BowlingScoringTests
     public class ScoreKeeperTests
     {
         private ScoreKeeper _scoreKeeper;
-
+        private const int STRIKE_VALUE = 10;
 
         [TestInitialize]
         public void Init()
@@ -41,7 +41,7 @@ namespace BowlingScoringTests
         [TestMethod]
         public void ScoreFrame_StrikeRolled_FirstFrameTotalEquals17()
         {
-            var frame = new BowlingFrame() { FirstRollScore = 10};
+            var frame = new BowlingFrame() { FirstRollScore = STRIKE_VALUE};
             var secondFrame = new BowlingFrame() { FirstRollScore = 4, SecondRollScore = 3 };
 
             _scoreKeeper.ScoreGame(new BowlingFrame[] { frame, secondFrame });
@@ -51,44 +51,46 @@ namespace BowlingScoringTests
         [TestMethod]
         public void ScoreGame_AllStrikes_TotalScoreEquals300()
         {
-            var frames = new BowlingFrame[10];
+            var frames = new BowlingFrame[STRIKE_VALUE];
             for (int i = 0; i < 10; i++)
             {
-                frames[i] = new BowlingFrame() { FirstRollScore = 10 };
+                frames[i] = new BowlingFrame() { FirstRollScore = STRIKE_VALUE };
             }
             frames[9].IsTenthFrame = true;
-            frames[9].SecondRollScore = 10;
-            frames[9].BonusRollScore = 10;
+            frames[9].SecondRollScore = STRIKE_VALUE;
+            frames[9].BonusRollScore = STRIKE_VALUE;
 
             _scoreKeeper.ScoreGame(frames);
             //300 is the maximum number of points in bowling
             //Assert.AreEqual(300, _scoreKeeper.TotalScore);
 
         }
-
-        private BowlingFrame _strikeFrameNeedingScore;
-
-        private bool IsStrike(BowlingFrame frame)
-        {
-            return frame.FirstRollScore == 10;
-        }
-
-        private bool IsSpare(BowlingFrame frame)
-        {
-            return frame.FirstRollScore + frame.SecondRollScore == 10;
-        }
+        
         [TestMethod]
         public void ScoreGame_RollTwoStrikes_FirstFrameScore25()
         {
             var game = new BowlingFrame[3];
 
-            game[0] = new BowlingFrame() { FirstRollScore = 10, FinishedEnteringRolls = true };
-            game[1] = new BowlingFrame() { FirstRollScore = 10, FinishedEnteringRolls = true };
+            game[0] = new BowlingFrame() { FirstRollScore = STRIKE_VALUE, FinishedEnteringRolls = true };
+            game[1] = new BowlingFrame() { FirstRollScore = STRIKE_VALUE, FinishedEnteringRolls = true };
             game[2] = new BowlingFrame() { FirstRollScore = 5, FinishedEnteringRolls = true };
 
             _scoreKeeper.ScoreGame(game);
 
             Assert.AreEqual(25, game[0].TotalFrameScore);
+        }
+
+        [TestMethod]
+        public void ScoreGame_TenthFrame_Score30()
+        {
+            var game = new BowlingFrame[]
+            {
+                new BowlingFrame {FirstRollScore = STRIKE_VALUE, SecondRollScore = STRIKE_VALUE, BonusRollScore = STRIKE_VALUE, IsTenthFrame = true}
+            };
+
+            _scoreKeeper.ScoreGame(game);
+
+            Assert.AreEqual(30, game[0].TotalFrameScore);
         }
     }
 }

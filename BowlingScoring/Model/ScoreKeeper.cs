@@ -11,8 +11,10 @@ namespace BowlingScoring.Model
     /// </summary>
     public class ScoreKeeper
     {
-        private const int NUMBER_OF_PINS = 10;
-      
+        public ScoreKeeper() { }
+
+        private const int STRIKE_VALUE = 10;
+
         public void ScoreGame(BowlingFrame[] game)
         {
             var currentFrameScore = 0;
@@ -20,28 +22,28 @@ namespace BowlingScoring.Model
             for (int i = 0; i < game.Length; i++)
             {
                 var frame = game[i];
-                if (!frame.FinishedEnteringRolls) break;
-                if (frame.ScoringFinished)
+                if (!frame.FinishedEnteringRolls && !frame.IsTenthFrame) break;
+                if (frame.FinishedScoring)
                 {
                     gameScore = frame.TotalFrameScore;
                     continue;
                 }
                 if (frame.IsTenthFrame) //the scoring of the last frame is different and a little tricky, so we score it seperately from the rest
                 {
-                    ScoreTenthFrame(frame);
-                    continue;
+                    frame.TotalFrameScore = ScoreTenthFrame(frame) + gameScore;
+                    break;
                 }
 
-                if (IsStrike(frame)) { currentFrameScore = ScoreStrike(game, i);}
+                if (IsStrike(frame)) { currentFrameScore = ScoreStrike(game, i); }
 
                 else if (IsSpare(frame)) { currentFrameScore = ScoreSpare(game, i); }
-                
+
                 else
                 {
                     currentFrameScore = frame.FirstRollScore + frame.SecondRollScore;
-                    frame.ScoringFinished = true;
+                    frame.FinishedScoring = true;
                 }
-                
+
                 frame.TotalFrameScore = currentFrameScore + gameScore;
                 gameScore += currentFrameScore;
             }
@@ -51,72 +53,81 @@ namespace BowlingScoring.Model
         {
             if (game[currentIndex + 1].FirstRollScore > 0)
             {
-                game[currentIndex].ScoringFinished = true;
-                return NUMBER_OF_PINS + game[currentIndex + 1].FirstRollScore;
-                
+                game[currentIndex].FinishedScoring = true;
+                return STRIKE_VALUE + game[currentIndex + 1].FirstRollScore;
+
             }
-            else { return NUMBER_OF_PINS;}
+            else { return STRIKE_VALUE; }
         }
 
         private int ScoreStrike(BowlingFrame[] game, int i)
         {
-            var frame = game[i];
-            var currentFrameScore = frame.FirstRollScore;
-            //if the current frame is a strike AND the next frame is a strike, we also need the first roll from two frames ahead
+            var currentFrame = game[i];
+            currentFrame.FinishedEnteringRolls = true;
+            var currentFrameScore = currentFrame.FirstRollScore;
             var nextFrame = game[i + 1];
             var nextFrameFirstRollValue = nextFrame.FirstRollScore;
-            if (nextFrame.FinishedEnteringRolls) //We want to update the view in real time, but only after the scoring of the two bonus rolls are done.
+
+            if (nextFrame.FinishedScoring || nextFrame.IsTenthFrame) //We want to update the score in real time, if the next frame is a strike then it will not be finished entering roll
             {
                 if (IsStrike(nextFrame) && nextFrame.IsTenthFrame) //the scoring of the tenth frame is tricky and also affects the ninth
                 {
-                    currentFrameScore = frame.FirstRollScore + nextFrameFirstRollValue + nextFrame.SecondRollScore;
-                    frame.ScoringFinished = true;
+                    currentFrameScore = currentFrame.FirstRollScore + nextFrameFirstRollValue + nextFrame.SecondRollScore;
                 }
                 else if (IsStrike(nextFrame) && game[i + 2].FinishedEnteringRolls)
                 {
-                    currentFrameScore = frame.FirstRollScore + nextFrameFirstRollValue + game[i + 2].FirstRollScore;
-                    frame.ScoringFinished = true;
+                    currentFrameScore = currentFrame.FirstRollScore + nextFrameFirstRollValue + game[i + 2].FirstRollScore;
+                    currentFrame.FinishedScoring = true;
                 }
                 else
                 {
-                    currentFrameScore = frame.FirstRollScore + nextFrameFirstRollValue + nextFrame.SecondRollScore;
+                    currentFrameScore = currentFrame.FirstRollScore + nextFrameFirstRollValue + nextFrame.SecondRollScore;
                 }
             }
             else
             {
-                currentFrameScore += nextFrameFirstRollValue; //The next frame may not be finished, but it could have it's first roll entered, in which case we are still updating the score
+                var secondBonusRoll = IsStrike(nextFrame) ? game[i + 2].FirstRollScore : nextFrame.SecondRollScore;
+                currentFrameScore += nextFrameFirstRollValue + secondBonusRoll; //The next frame may not be finished, but it could have it's first roll entered, in which case we are still updating the score
             }
             return currentFrameScore;
         }
 
-
-        private void ScoreTenthFrame(BowlingFrame frame)
-        {            
-            //todo: finish tenth frame logic
+        private int ScoreTenthFrame(BowlingFrame frame)
+        {
             if (IsStrike(frame) || IsSpare(frame))
             {
                 frame.FinishedEnteringRolls = false;
                 frame.HasTenthFrameBonus = true;
-                frame.TotalFrameScore = frame.FirstRollScore + frame.SecondRollScore + frame.BonusRollScore;
-                //TotalScore += frame.TotalFrameScore;
-                return;
-                //frame.TotalFrameScore = frame.RollOneScore + frame.RollTwoScore + frame.BonusRollScore;
             }
-            if (frame.SecondRollScore == NUMBER_OF_PINS)
+            else
+            {
+                frame.HasTenthFrameBonus = false;
+            }
+
+            if (frame.SecondRollScore == STRIKE_VALUE)
             {
                 frame.FinishedEnteringRolls = false;
-                //has bonus
             }
+
+            if (frame.HasTenthFrameBonus && !string.IsNullOrEmpty(frame.BonusRollString))
+            {
+                frame.FinishedEnteringRolls = true;
+                frame.FinishedScoring = true;
+            }
+
+            return frame.FirstRollScore + frame.SecondRollScore + frame.BonusRollScore;
         }
 
         private bool IsStrike(BowlingFrame frame)
         {
-            return frame.FirstRollScore == NUMBER_OF_PINS;
+            return frame.FirstRollScore == STRIKE_VALUE;
         }
 
         private bool IsSpare(BowlingFrame frame)
         {
-            return frame.FirstRollScore + frame.SecondRollScore == NUMBER_OF_PINS;
+            return frame.FirstRollScore + frame.SecondRollScore == STRIKE_VALUE;
         }
+
+
     }
 }

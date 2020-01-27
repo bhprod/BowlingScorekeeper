@@ -8,12 +8,14 @@ using System.Threading.Tasks;
 
 namespace BowlingScoring.ViewModel
 {
-
-    public class FrameViewModel : INotifyPropertyChanged
+    /// <summary>
+    /// Serves to bridge the gap between the FrameView and a BowlingFrame (the model).
+    /// Subscribes to a BowlingFrame's score updates and then calls ScoreKeeper to calculate the frame's score.
+    /// </summary>
+    public class FrameViewModel
     {
-        public FrameViewModel() 
-        {
-            _scoreKeeper = new ScoreKeeper();
+        public FrameViewModel() {
+
             _frames = new BowlingFrame[10];
             for (int i = 0; i < 10; i++)
             {
@@ -21,15 +23,8 @@ namespace BowlingScoring.ViewModel
                 bowlingFrame.RollScoreEntered += BowlingFrame_RollScoreEntered;
                 _frames[i] = bowlingFrame;
             }
-
             FrameTen.IsTenthFrame = true;
-        }
-
-        private ScoreKeeper _scoreKeeper;
-        private void BowlingFrame_RollScoreEntered(object sender, EventArgs e)
-        {
-            _scoreKeeper.ScoreGame(_frames);            
-        }
+        }       
 
         #region Frames
         private BowlingFrame[] _frames;
@@ -45,10 +40,9 @@ namespace BowlingScoring.ViewModel
         public BowlingFrame FrameTen => _frames[9];
         #endregion
 
-        public event PropertyChangedEventHandler PropertyChanged;
-        private void OnPropertyChanged(string propertyName)
+        private void BowlingFrame_RollScoreEntered(object sender, EventArgs e)
         {
-            PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
-        }
+            new ScoreKeeper().ScoreGame(_frames);            
+        }        
     }
 }

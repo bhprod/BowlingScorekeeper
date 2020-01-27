@@ -12,8 +12,8 @@
     <UserControl.Resources>
         <BooleanToVisibilityConverter x:Key="BoolToVisibilityConverter" />
         <bowlingscoring:InverseBoolConverter x:Key="InverseBooleanConverter" />
-    </UserControl.Resources>    
-    <Grid>
+    </UserControl.Resources>
+    <Grid Background="Transparent" HorizontalAlignment="Right">
         <Grid.ColumnDefinitions>
             <ColumnDefinition Width="Auto" />
         </Grid.ColumnDefinitions>
@@ -24,52 +24,89 @@
             <StackPanel Orientation="Horizontal" Grid.Column="1" Grid.Row="0" HorizontalAlignment="Right">
                 <TextBox x:Name="BallOneScore" Text="{Binding FirstRollString, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" CharacterCasing="Lower">
                     <TextBox.Style>
-                        <Style TargetType="{x:Type TextBox}">
-                        <Setter Property="BorderBrush" Value="Black" />
-                        <Setter Property="BorderThickness" Value="1" />
-                        <Setter Property="Width" Value="100"/>
-                        </Style>
-                    </TextBox.Style>
-                </TextBox>
-                <TextBox Name="BallTwoScore" Text="{Binding SecondRollString, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}">
-                    <TextBox.Style>
-                        <Style TargetType="{x:Type TextBox}">
-                            <Setter Property="BorderBrush" Value="Black" />
-                            <Setter Property="BorderThickness" Value="1" />
-                            <Setter Property="Width" Value="100"/>
+                        <Style TargetType="{x:Type TextBox}" BasedOn="{StaticResource TextBoxStyle}">
                             <Style.Triggers>
-                                <!-- We don't want to allow the user to enter a score for the second roll before the first roll -->
-                                <DataTrigger Binding="{Binding Text, ElementName=BallOneScore, UpdateSourceTrigger=PropertyChanged}" Value="" >
-                                    <Setter Property="IsEnabled" Value="False" />
-                                </DataTrigger>
-                                <!-- We also don't want the user to have to tab past when a strike was scored -->
-                                <DataTrigger Binding="{Binding Text, ElementName=BallOneScore, UpdateSourceTrigger=PropertyChanged}" Value="x">
+                                <DataTrigger Binding="{Binding FinishedEnteringRolls}" Value="True" >
                                     <Setter Property="IsEnabled" Value="False" />
                                 </DataTrigger>
                             </Style.Triggers>
                         </Style>
                     </TextBox.Style>
                 </TextBox>
+                <TextBox Name="BallTwoScore" Text="{Binding SecondRollString, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" HorizontalAlignment="Right">
+                    <TextBox.Style>
+                        <Style TargetType="{x:Type TextBox}" BasedOn="{StaticResource TextBoxStyle}">
+                            <Style.Triggers>
+                                <!-- We don't want to allow the user to enter a score for the second roll before the first roll -->
+                                <DataTrigger Binding="{Binding Text, ElementName=BallOneScore, UpdateSourceTrigger=PropertyChanged}" Value="" >
+                                    <Setter Property="IsEnabled" Value="False" />
+                                </DataTrigger>
+                                <DataTrigger Binding="{Binding ScoringFinished}" Value="True" >
+                                    <Setter Property="IsEnabled" Value="False" />
+                                </DataTrigger>
+                                <DataTrigger Binding="{Binding FinishedEnteringRolls}" Value="True">
+                                    <Setter Property="IsEnabled" Value="False" />
+                                </DataTrigger>
+                                
+                                <MultiDataTrigger>
+                                    <MultiDataTrigger.Conditions>
+                                        <Condition Binding="{Binding Text, ElementName=BallOneScore, UpdateSourceTrigger=PropertyChanged}" Value="x"/>
+                                        <Condition Binding="{Binding ElementName=Frame, Path=DataContext.FinishedEnteringRolls}" Value="True" />
+                                    </MultiDataTrigger.Conditions>
+                                    <Setter Property="IsEnabled" Value="False" />
+                                </MultiDataTrigger>
+                            </Style.Triggers>
+                        </Style>
+                    </TextBox.Style>
+                </TextBox>
 
-                <TextBox Name="BonusBallScore" Text="{Binding BonusRollScore, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" Visibility="{Binding HasTenthFrameBonus, Converter={StaticResource BoolToVisibilityConverter}, UpdateSourceTrigger=PropertyChanged}"/>
+                <TextBox Name="BonusBallScore" Text="{Binding BonusRollString, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" Visibility="{Binding HasTenthFrameBonus, Converter={StaticResource BoolToVisibilityConverter}, UpdateSourceTrigger=PropertyChanged}">
+                    <TextBox.Style>
+                        <Style TargetType="{x:Type TextBox}" BasedOn="{StaticResource TextBoxStyle}">
+                            <Style.Triggers>
+                                <MultiDataTrigger>
+                                    <MultiDataTrigger.Conditions>
+                                        <Condition Binding="{Binding FinishedScoring}" Value="True"/>
+                                        <Condition Binding="{Binding FinishedEnteringRolls}" Value="True" />
+                                    </MultiDataTrigger.Conditions>
+                                    <Setter Property="IsEnabled" Value="False" />
+                                </MultiDataTrigger>
+                            </Style.Triggers>
+                        </Style>
+                    </TextBox.Style>
+                </TextBox>
         </StackPanel>
 
             <TextBlock Text="{Binding TotalFrameScore}" Grid.Row="1" Grid.Column="1" >
                 <TextBlock.Style>
-                    <Style TargetType="{x:Type TextBlock}">
-                        <Setter Property="Visibility" Value="Hidden" />
+                    <Style TargetType="{x:Type TextBlock}" BasedOn="{StaticResource TextBlockStyle}">
+                        <Setter Property="Visibility" Value="Visible" />
                         <Setter Property="HorizontalAlignment" Value="Center"/>
                         <Setter Property="VerticalAlignment" Value="Bottom"/>
                         <Setter Property="FontSize" Value="24"/>
-                        <Setter Property="Foreground" Value="Black" />
                         <Style.Triggers>
-                            <DataTrigger Binding="{Binding ElementName=Frame, Path=DataContext.FinishedEnteringRolls, UpdateSourceTrigger=PropertyChanged}" Value="True" >
-                                <Setter Property="Visibility" Value="Visible"/>
+                            <MultiDataTrigger>
+                                <MultiDataTrigger.Conditions>
+                                    <Condition Binding="{Binding IsTenthFrame}" Value="True" />
+                                    <Condition Binding="{Binding TotalFrameScore}" Value="0" />
+                                </MultiDataTrigger.Conditions>
+                                <Setter Property="Visibility" Value="Hidden" />
+                            </MultiDataTrigger>
+                            <DataTrigger Binding="{Binding TotalFrameScore}" Value="0">
+                                <Setter Property="Visibility" Value="Hidden" />
                             </DataTrigger>
+                            <MultiDataTrigger>
+                                <MultiDataTrigger.Conditions>
+                                    <Condition Binding="{Binding TotalFrameScore}" Value="0" />
+                                    <Condition Binding="{Binding FinishedScoring}" Value="True"/>
+                                </MultiDataTrigger.Conditions>
+                                <Setter Property="Visibility" Value="Visible"/>
+                            </MultiDataTrigger>
                         </Style.Triggers>
                     </Style>
                 </TextBlock.Style>
             </TextBlock>
         </StackPanel>
     </Grid>
+
 </UserControl>

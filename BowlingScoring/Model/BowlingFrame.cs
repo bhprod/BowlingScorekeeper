@@ -7,13 +7,22 @@ using System.Threading.Tasks;
 
 namespace BowlingScoring.Model
 {
+    /// <summary>
+    /// Serves as a round in a game of bowling. A frame consists of two scores representing the two possible rolls in a round.
+    /// <para/>
+    /// An "x" value for the first roll signifies a strike, if a strike occurs then the second roll is skipped.
+    /// A "-" value for either roll indicates a miss (no pins hit).
+    /// A "/" value is a spare, which can only be rolled on the second try.
+    /// <para/>
+    /// This class contains minimal logic pertaining to the score of a roll.
+    /// </summary>
     public class BowlingFrame : INotifyPropertyChanged
     {
         //TODO: bug where if scores are entered, then deleted in reverse order the score will not update
 
         public BowlingFrame() { }
 
-        private const int NUMBER_OF_PINS = 10;
+        private const int STRIKE_VALUE = 10;
 
         #region Events
         public event PropertyChangedEventHandler PropertyChanged;
@@ -39,10 +48,7 @@ namespace BowlingScoring.Model
             {
                 _firstRollScore = value;
                 OnPropertyChanged(nameof(FirstRollScore));
-                if (value == NUMBER_OF_PINS)
-                {
-                    FinishedEnteringRolls = true;
-                }
+                if (value == STRIKE_VALUE) { FinishedEnteringRolls = true; }
                 OnRollScoreEntered();
             }
         }
@@ -51,18 +57,20 @@ namespace BowlingScoring.Model
             get { return _firstRollString; }
             set
             {
+                FinishedScoring = false;
+
                 if (string.IsNullOrEmpty(value))
                 {
                     _firstRollString = "";
-                    ScoringFinished = false;
+                    FirstRollScore = 0;
                     return;
                 }
 
                 if (value.Equals("x", StringComparison.OrdinalIgnoreCase))
                 {
-                    FinishedEnteringRolls = true;
-                    FirstRollScore = NUMBER_OF_PINS;
-                    SecondRollString = (IsTenthFrame) ? "" : "-";
+                    FinishedEnteringRolls = IsTenthFrame ? false : true;
+                    FirstRollScore = STRIKE_VALUE;
+                    SecondRollString = IsTenthFrame ? "" : "-";
                     _firstRollString = value;
 
                 }
@@ -83,16 +91,24 @@ namespace BowlingScoring.Model
                 OnPropertyChanged(nameof(FirstRollString));
             }
         }
-
         #endregion
 
         #region Second Roll
-        private int _rollTwoScore;
+        private int _secondRollScore;
         public int SecondRollScore
         {
-            get { return _rollTwoScore; }
-            set { _rollTwoScore = value; OnPropertyChanged(nameof(SecondRollScore)); OnRollScoreEntered(); }
+            get { return _secondRollScore; }
+            set { _secondRollScore = value; OnPropertyChanged(nameof(SecondRollScore)); OnRollScoreEntered(); }
         }
+
+        private bool IsValidSpare(int compareTo)
+        {
+            return compareTo != STRIKE_VALUE;
+        }
+
+        //TODO group logical blocks of code together (validation next to each other)
+        //write unit tests
+
 
         private string _secondRollString;
         public string SecondRollString
@@ -100,35 +116,31 @@ namespace BowlingScoring.Model
             get { return _secondRollString; }
             set
             {
-                if (string.IsNullOrEmpty(value))
-                {
-                    _secondRollString = "";
-                    ScoringFinished = false;
-                    return;
-                }
-
-                if (value.Equals("/"))
+                if (value.Equals("/") && IsValidSpare(FirstRollScore)) //cannot be a spare if first roll was strike
                 {
                     _secondRollString = value;
-                    FinishedEnteringRolls = true;
-                    SecondRollScore = NUMBER_OF_PINS - _firstRollScore;
+                    FinishedEnteringRolls = IsTenthFrame ? false : true;
+                    SecondRollScore = STRIKE_VALUE - _firstRollScore;
                 }
-                else if (value.Equals("-")) { SecondRollScore = 0; _secondRollString = value; FinishedEnteringRolls = true; }
-                else if (int.TryParse(value, out int score))
+                else
                 {
-                    if ((_firstRollScore + score > NUMBER_OF_PINS) || (score > 9 || score < 1)) //Validate the int and ensure the score can't sum to > 10 
+                    var parsedStringInt = ValidateStringToInt(value, _firstRollScore);
+                    if (parsedStringInt == 0)
                     {
-                        _secondRollString = "";
-                        return;
+                        _secondRollString = (!IsTenthFrame && _firstRollScore == STRIKE_VALUE) ? "-" : "";
+                        FinishedEnteringRolls = IsTenthFrame ? false : true;
                     }
                     else
                     {
                         _secondRollString = value;
-                        FinishedEnteringRolls = true;
-                        SecondRollScore = score;
+                        FinishedEnteringRolls = IsTenthFrame ? false : true;
                     }
+
+                    SecondRollScore = parsedStringInt;
                 }
+                BonusRollString = "";
                 OnPropertyChanged(nameof(SecondRollString));
+                
             }
         }
         #endregion
@@ -144,8 +156,46 @@ namespace BowlingScoring.Model
         public int BonusRollScore
         {
             get { return _bonusRollScore; }
-            set { _bonusRollScore = value; OnPropertyChanged(nameof(BonusRollScore)); OnRollScoreEntered(); }
+            set
+            {
+                _bonusRollScore = value;
+                OnRollScoreEntered();
+                OnPropertyChanged(nameof(BonusRollScore));
+            }
         }
+
+        private string _bonusRollString;
+        public string BonusRollString
+        {
+            get { return _bonusRollString; }
+            set
+            {
+                if (value.Equals("/") && IsValidSpare(SecondRollScore))
+                {
+                    _bonusRollString = value;
+                    FinishedEnteringRolls = IsTenthFrame ? false : true;
+                    BonusRollScore = STRIKE_VALUE - _secondRollScore;
+                }
+                else
+                {
+                    var parsedStringInt = ValidateStringToInt(value, _secondRollScore);
+                    if (parsedStringInt == 0)
+                    {
+                        _bonusRollString = (!IsTenthFrame && _firstRollScore == STRIKE_VALUE) ? "-" : value;
+                        FinishedEnteringRolls = IsTenthFrame ? false : true;
+                    }
+                    else
+                    {
+                        _bonusRollString = value;
+                        FinishedEnteringRolls = IsTenthFrame ? false : true;
+                    }
+
+                    BonusRollScore = parsedStringInt;
+                }
+                
+                OnPropertyChanged(nameof(BonusRollString));
+            }
+        }      
 
         private bool _isTenthFrame;
         public bool IsTenthFrame
@@ -155,6 +205,20 @@ namespace BowlingScoring.Model
         }
 
         #endregion
+        private int ValidateStringToInt(string value, int previousRollScore = 0)
+        {
+             if (value.Equals("") || value.Equals("-")) return 0;
+
+            if (value.Equals("x", StringComparison.OrdinalIgnoreCase)) return STRIKE_VALUE;
+
+            if (int.TryParse(value, out int toReturn))
+            {
+                if (toReturn < 10 && toReturn >= 0) return toReturn;
+            }
+
+            return 0;
+        }
+
 
         private int _totalFrameScore;
         public int TotalFrameScore
@@ -175,10 +239,10 @@ namespace BowlingScoring.Model
         }
 
         private bool _scoringFinished;
-        public bool ScoringFinished
+        public bool FinishedScoring
         {
             get { return _scoringFinished; }
-            set { _scoringFinished = value; OnPropertyChanged(nameof(ScoringFinished)); }
+            set { _scoringFinished = value; OnPropertyChanged(nameof(FinishedScoring)); }
         }
     }
 }

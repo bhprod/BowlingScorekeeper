@@ -16,11 +16,11 @@ using System.Windows.Shapes;
 namespace BowlingScoring.View
 {
     /// <summary>
-    /// Serves as the UI representation of a frame.
+    /// Interaction logic for SingleGameView.xaml
     /// </summary>
-    public partial class FrameView : UserControl
+    public partial class SingleGameView : UserControl
     {
-        public FrameView()
+        public SingleGameView()
         {
             InitializeComponent();
         }

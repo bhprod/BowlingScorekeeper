@@ -6,5 +6,31 @@
              StartupUri="MainWindow.xaml">
     <Application.Resources>
         <viewmodel:FrameViewModel x:Key="ViewModel" />
+
+        <SolidColorBrush x:Key="DefaultBackgroundBrush" Color="#444444"/>
+        <SolidColorBrush x:Key="ApplicationBackgroundBrush" Color="#2b2b2b"/>
+        <SolidColorBrush x:Key="DefaultTextBrush" Color="#bfbfbf"/>
+
+        <Style x:Key="TextBoxStyle" TargetType="{x:Type TextBox}">
+            <Setter Property="Foreground" Value="{StaticResource DefaultTextBrush}" />
+            <Setter Property="Background" Value="{StaticResource ApplicationBackgroundBrush}"/>
+            <Setter Property="BorderBrush" Value="MediumPurple"/>
+            <Setter Property="BorderThickness" Value="1"/>
+            <Setter Property="HorizontalAlignment" Value="Right" />
+            <Setter Property="Width" Value="60" />
+        </Style>
+
+        <Style x:Key="BorderContainerStyle" TargetType="{x:Type Border}">
+            <Setter Property="BorderBrush" Value="MediumPurple" />
+            <Setter Property="BorderThickness" Value="2"/>
+            <Setter Property="Background" Value="{StaticResource DefaultBackgroundBrush}" />
+            <Setter Property="CornerRadius" Value="3"/>
+        </Style>
+
+        <Style x:Key="TextBlockStyle" TargetType="{x:Type TextBlock}">
+            <Setter Property="Foreground" Value="{StaticResource DefaultTextBrush}"/>
+            <Setter Property="Margin" Value="5,0,5,0"/>
+            <Setter Property="FontSize" Value="14"/>
+        </Style>
     </Application.Resources>
 </Application>
