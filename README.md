@@ -2,7 +2,7 @@
 A simple score keeper for bowling, created in WPF/C# using the MVVM design pattern.
 
 ---
-Usage:
+Usage
 ---
 
 Keep score of an individual player's bowling scores by entering the number of pins hit in the textboxes for each corresponding frame.
@@ -17,21 +17,21 @@ Because the score is updated in real time, an incomplete game will still score u
 
 ---
 
-How to open:
+How to open
 ---
 
-Download and extract the zip, then open in visual studio and build solution.
+Download and extract the zip, then open in visual studio and build solution. Note that since it's WPF it only runs in Windows.
 
 ---
 
-Challenges & tests:
+Challenges & tests
 ---
 
 The specific challenge in creating this project was real-time updating of scores and using the MVVM pattern without a 3rd party library.
 Unit tests are included for the two model classes containing logic.
 
 ---
-Notes & credit:
+Notes & credit
 ---
 
 Correct score for test case references were from https://www.bowlinggenius.com/
