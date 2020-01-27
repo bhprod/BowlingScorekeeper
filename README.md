@@ -8,7 +8,7 @@ Usage
 Keep score of an individual player's bowling scores by entering the number of pins hit in the textboxes for each corresponding frame.
 You can add player names and create as many score tracks as you wish, so scoring is possible for multiple players.
 Enter 'x' for a strike, '/' for a spare, '-' for a miss, otherwise type the number for how many pins were hit.
-Strikes count as 10 points plus the next two rolls. If the next frame is also a strike then the first roll of the corresponding frame will be scored.
+Strikes count as 10 points plus the next two rolls; If the next frame is also a strike then the first roll of the corresponding frame will be scored.
 Spares count as 10 points plus the next roll.
 Open frames (no strikes or spares) count only the number of pins hit.
 After the score is entered the textboxes for each frame are disabled to prevent errors.
