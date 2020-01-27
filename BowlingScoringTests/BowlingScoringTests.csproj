@@ -51,6 +51,7 @@
   <ItemGroup>
     <Compile Include="ScoreKeeperTests.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="BowlingFrameTests.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="packages.config" />

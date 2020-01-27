@@ -18,8 +18,6 @@ namespace BowlingScoring.Model
     /// </summary>
     public class BowlingFrame : INotifyPropertyChanged
     {
-        //TODO: bug where if scores are entered, then deleted in reverse order the score will not update
-
         public BowlingFrame() { }
 
         private const int STRIKE_VALUE = 10;
@@ -99,16 +97,7 @@ namespace BowlingScoring.Model
         {
             get { return _secondRollScore; }
             set { _secondRollScore = value; OnPropertyChanged(nameof(SecondRollScore)); OnRollScoreEntered(); }
-        }
-
-        private bool IsValidSpare(int compareTo)
-        {
-            return compareTo != STRIKE_VALUE;
-        }
-
-        //TODO group logical blocks of code together (validation next to each other)
-        //write unit tests
-
+        }      
 
         private string _secondRollString;
         public string SecondRollString
@@ -145,7 +134,7 @@ namespace BowlingScoring.Model
         }
         #endregion
 
-        #region 10th frame
+        #region 10th Frame Bonus
         private bool _hasTenthFrameBonus;
         public bool HasTenthFrameBonus
         {
@@ -197,14 +186,9 @@ namespace BowlingScoring.Model
             }
         }      
 
-        private bool _isTenthFrame;
-        public bool IsTenthFrame
-        {
-            get { return _isTenthFrame; }
-            set { _isTenthFrame = value; OnPropertyChanged(nameof(IsTenthFrame)); }
-        }
-
         #endregion
+
+        #region Validation
         private int ValidateStringToInt(string value, int previousRollScore = 0)
         {
              if (value.Equals("") || value.Equals("-")) return 0;
@@ -219,6 +203,19 @@ namespace BowlingScoring.Model
             return 0;
         }
 
+        private bool IsValidSpare(int compareTo)
+        {
+            return compareTo != STRIKE_VALUE;
+        }
+        #endregion
+
+        #region End game
+        private bool _isTenthFrame;
+        public bool IsTenthFrame
+        {
+            get { return _isTenthFrame; }
+            set { _isTenthFrame = value; OnPropertyChanged(nameof(IsTenthFrame)); }
+        }
 
         private int _totalFrameScore;
         public int TotalFrameScore
@@ -244,5 +241,6 @@ namespace BowlingScoring.Model
             get { return _scoringFinished; }
             set { _scoringFinished = value; OnPropertyChanged(nameof(FinishedScoring)); }
         }
+        #endregion
     }
 }

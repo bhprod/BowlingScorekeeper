@@ -1,10 +1,15 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 using BowlingScoring.Model;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 
 namespace BowlingScoringTests
 {
+    /// <summary>
+    /// Test cases for scorekeeper. Frames are created and then injected into scorekeeper's methods.
+    /// Note that frames must have "FinishedEnteringRolls" set to true in order for scorekeeper to score their points.
+    /// </summary>
     [TestClass]
     public class ScoreKeeperTests
     {
@@ -20,18 +25,18 @@ namespace BowlingScoringTests
         [TestMethod]
         public void ScoreFrame_Roll3And6_FrameTotalEquals9()
         {
-            var frame = new BowlingFrame() { FirstRollScore = 3, SecondRollScore = 6 };
+            var frame = new BowlingFrame() { FirstRollScore = 3, SecondRollScore = 6, FinishedEnteringRolls = true };
 
             _scoreKeeper.ScoreGame(new BowlingFrame[] { frame });
 
-            Assert.AreEqual(frame.TotalFrameScore, 9);
+            Assert.AreEqual(9, frame.TotalFrameScore);
         }
 
         [TestMethod]
         public void ScoreFrame_SpareRolled_FirstFrameTotalEquals13()
         {
-            var frame = new BowlingFrame() { FirstRollScore = 5, SecondRollScore = 5 };
-            var secondFrame = new BowlingFrame() { FirstRollScore = 3, SecondRollScore = 2 };
+            var frame = new BowlingFrame() { FirstRollScore = 5, SecondRollScore = 5, FinishedEnteringRolls = true };
+            var secondFrame = new BowlingFrame() { FirstRollScore = 3, SecondRollScore = 2, FinishedEnteringRolls = true };
 
             _scoreKeeper.ScoreGame(new BowlingFrame[] { frame, secondFrame });
 
@@ -62,8 +67,7 @@ namespace BowlingScoringTests
 
             _scoreKeeper.ScoreGame(frames);
             //300 is the maximum number of points in bowling
-            //Assert.AreEqual(300, _scoreKeeper.TotalScore);
-
+            Assert.AreEqual(300, frames[9].TotalFrameScore);
         }
         
         [TestMethod]
@@ -89,8 +93,36 @@ namespace BowlingScoringTests
             };
 
             _scoreKeeper.ScoreGame(game);
-
             Assert.AreEqual(30, game[0].TotalFrameScore);
+        }
+
+        [TestMethod]
+        public void ScoreGame_TenthFrameOpen_HasTenthFrameBonusFalse()
+        {
+            var frame = new BowlingFrame()
+            {
+                FirstRollScore = 2,
+                SecondRollScore = 2
+            };
+
+            _scoreKeeper.ScoreGame(new[] { frame });
+
+            Assert.IsFalse(frame.HasTenthFrameBonus);
+        }
+
+        [TestMethod]
+        public void ScoreGame_TenthFrameSpare_HasTenthFrameBonus()
+        {
+            var frame = new BowlingFrame()
+            {
+                FirstRollScore = 2,
+                SecondRollScore = 8,
+                IsTenthFrame = true
+            };
+
+            _scoreKeeper.ScoreGame(new[] { frame });
+
+            Assert.IsTrue(frame.HasTenthFrameBonus);
         }
     }
 }

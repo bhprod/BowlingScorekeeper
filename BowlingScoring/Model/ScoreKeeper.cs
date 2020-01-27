@@ -127,7 +127,5 @@ namespace BowlingScoring.Model
         {
             return frame.FirstRollScore + frame.SecondRollScore == STRIKE_VALUE;
         }
-
-
     }
 }
