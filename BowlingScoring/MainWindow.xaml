@@ -15,10 +15,13 @@
             <RowDefinition Height="Auto" />
         </Grid.RowDefinitions>
 
+        <ScrollViewer HorizontalScrollBarVisibility="Disabled" Grid.Row="0" Grid.RowSpan="2"
+                  VerticalScrollBarVisibility="Auto">
         <StackPanel Grid.Row="0" Grid.RowSpan="2">
             <TextBlock Text="Bowling Scorekeeper" Style="{StaticResource TextBlockStyle}" FontSize="24" HorizontalAlignment="Stretch" TextAlignment="Center" Margin="5" Width="{Binding ElementName=GameBoard, Path=ActualWidth}"/>
             <view:GameBoardView x:Name="GameBoard" HorizontalAlignment="Stretch" Grid.Row="1" />
         </StackPanel>
+        </ScrollViewer>
 
         <TextBlock Grid.Row="2" HorizontalAlignment="Right" Style="{StaticResource TextBlockStyle}" Text="Enter 'x' to score a strike.&#10;Enter '/' to score a spare.&#10;Enter '-' to score a miss."/>     
 

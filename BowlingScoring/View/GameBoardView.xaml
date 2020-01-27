@@ -8,63 +8,63 @@
              mc:Ignorable="d" 
              d:DesignHeight="450" d:DesignWidth="1000">
     <Grid Width="Auto">
-        <Grid.ColumnDefinitions>
-            <ColumnDefinition Width="Auto"/>
-            <ColumnDefinition Width="Auto"/>
-            <ColumnDefinition Width="Auto"/>
-        </Grid.ColumnDefinitions>
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="Auto"/>
+                <ColumnDefinition Width="Auto"/>
+                <ColumnDefinition Width="Auto"/>
+            </Grid.ColumnDefinitions>
 
-        <Grid.RowDefinitions>
-            <RowDefinition />
-            <RowDefinition />
-            <RowDefinition />
-        </Grid.RowDefinitions>      
-        
-        <StackPanel x:Name="GameBoard" Orientation="Vertical" Grid.Column="1" Grid.Row="1">
-            <Grid>
-                <Grid.ColumnDefinitions>
-                    <ColumnDefinition Width="200"/>
-                    <ColumnDefinition Width="*" />
-                </Grid.ColumnDefinitions>
-            </Grid>
-            <Grid Grid.Column="1">
-                <Grid.Resources>
-                    <Style TargetType="{x:Type TextBlock}" BasedOn="{StaticResource TextBlockStyle}" >
-                        <Setter Property="HorizontalAlignment" Value="Center" />
-                        <Setter Property="TextAlignment" Value="Center" />
-                    </Style>
-                </Grid.Resources>
-                <Grid.ColumnDefinitions>
-                    <ColumnDefinition Width="110"/>
-                    <ColumnDefinition />
-                    <ColumnDefinition />
-                    <ColumnDefinition />
-                    <ColumnDefinition />
-                    <ColumnDefinition />
-                    <ColumnDefinition />
-                    <ColumnDefinition />
-                    <ColumnDefinition />
-                    <ColumnDefinition />
-                    <ColumnDefinition />
-                </Grid.ColumnDefinitions>
-                <TextBlock Text="Player Name(s)" Grid.Column="0" HorizontalAlignment="Left"/>
-                <TextBlock Text="1" Grid.Column="1" />
-                <TextBlock Text="2" Grid.Column="2" />
-                <TextBlock Text="3" Grid.Column="3"/>
-                <TextBlock Text="4" Grid.Column="4"/>
-                <TextBlock Text="5" Grid.Column="5"/>
-                <TextBlock Text="6" Grid.Column="6"/>
-                <TextBlock Text="7" Grid.Column="7"/>
-                <TextBlock Text="8" Grid.Column="8"/>
-                <TextBlock Text="9" Grid.Column="9"/>
-                <TextBlock Text="10" Grid.Column="10"/>
-            </Grid>
-            <view:SingleGameView />
-        </StackPanel>
+            <Grid.RowDefinitions>
+                <RowDefinition />
+                <RowDefinition />
+                <RowDefinition />
+            </Grid.RowDefinitions>
 
-        <StackPanel Grid.Column="2" Grid.Row="2">
-        <Button Content="New Game" Margin="5" Click="NewGame_Click"/>
-        <Button Content="Clear Board" Margin="5" Click="Button_Click"/>
-        </StackPanel>
-    </Grid>
+            <StackPanel x:Name="GameBoard" Orientation="Vertical" Grid.Column="1" Grid.Row="1">
+                <Grid>
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="200"/>
+                        <ColumnDefinition Width="*" />
+                    </Grid.ColumnDefinitions>
+                </Grid>
+                <Grid Grid.Column="1">
+                    <Grid.Resources>
+                        <Style TargetType="{x:Type TextBlock}" BasedOn="{StaticResource TextBlockStyle}" >
+                            <Setter Property="HorizontalAlignment" Value="Center" />
+                            <Setter Property="TextAlignment" Value="Center" />
+                        </Style>
+                    </Grid.Resources>
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="110"/>
+                        <ColumnDefinition />
+                        <ColumnDefinition />
+                        <ColumnDefinition />
+                        <ColumnDefinition />
+                        <ColumnDefinition />
+                        <ColumnDefinition />
+                        <ColumnDefinition />
+                        <ColumnDefinition />
+                        <ColumnDefinition />
+                        <ColumnDefinition />
+                    </Grid.ColumnDefinitions>
+                    <TextBlock Text="Player Name(s)" Grid.Column="0" HorizontalAlignment="Left"/>
+                    <TextBlock Text="1" Grid.Column="1" />
+                    <TextBlock Text="2" Grid.Column="2" />
+                    <TextBlock Text="3" Grid.Column="3"/>
+                    <TextBlock Text="4" Grid.Column="4"/>
+                    <TextBlock Text="5" Grid.Column="5"/>
+                    <TextBlock Text="6" Grid.Column="6"/>
+                    <TextBlock Text="7" Grid.Column="7"/>
+                    <TextBlock Text="8" Grid.Column="8"/>
+                    <TextBlock Text="9" Grid.Column="9"/>
+                    <TextBlock Text="10" Grid.Column="10"/>
+                </Grid>
+                <view:SingleGameView />
+            </StackPanel>
+
+            <StackPanel Grid.Column="2" Grid.Row="2">
+                <Button Content="New Game" Margin="5" Click="NewGame_Click"/>
+                <Button Content="Clear Board" Margin="5" Click="ClearBoard_Click"/>
+            </StackPanel>
+        </Grid>
 </UserControl>

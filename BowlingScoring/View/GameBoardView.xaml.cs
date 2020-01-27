@@ -36,25 +36,29 @@ namespace BowlingScoring.View
             gameBoard.Children.Add(new SingleGameView());
         }
 
-        private void Button_Click(object sender, RoutedEventArgs e)
+        private void ClearBoard_Click(object sender, RoutedEventArgs e)
         {
-            var gameBoard = FindName("GameBoard") as StackPanel;
-            var currentGames = new List<SingleGameView>();
-            for (int i = 0; i < VisualTreeHelper.GetChildrenCount(gameBoard); i++)
+            if (MessageBox.Show("Are you sure you want to clear all games?", "Confirm", MessageBoxButton.YesNo) == MessageBoxResult.Yes)
             {
-                var childElement = (Visual)VisualTreeHelper.GetChild(gameBoard, i);
 
-                if (childElement.GetType() == typeof(SingleGameView))
+                var gameBoard = FindName("GameBoard") as StackPanel;
+                var currentGames = new List<SingleGameView>();
+                for (int i = 0; i < VisualTreeHelper.GetChildrenCount(gameBoard); i++)
                 {
-                    currentGames.Add(childElement as SingleGameView);
-                }
-            }
+                    var childElement = (Visual)VisualTreeHelper.GetChild(gameBoard, i);
 
-            foreach (var game in currentGames)
-            {
-                gameBoard.Children.Remove(game);
+                    if (childElement.GetType() == typeof(SingleGameView))
+                    {
+                        currentGames.Add(childElement as SingleGameView);
+                    }
+                }
+
+                foreach (var game in currentGames)
+                {
+                    gameBoard.Children.Remove(game);
+                }
+                gameBoard.Children.Add(new SingleGameView() { DataContext = new FrameViewModel() });
             }
-            gameBoard.Children.Add(new SingleGameView() { DataContext = new FrameViewModel()});
         }
     }
 }
